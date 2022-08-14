@@ -10,10 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// `id` is the relation id of the community for database purposes.
+// `community_id` is the id created by the community owner, e.x. 'VEXRP'.
 model system_communities {
-  id          Int      @id @default(autoincrement())
-  string_id   String   @unique @db.VarChar(10)
-  name        String   @db.LongText
-  created_at  DateTime @default(now())
-  is_disabled Boolean  @default(false)
+  id           Int      @id @default(autoincrement())
+  community_id String   @unique @db.VarChar(10)
+  name         String   @db.LongText
+  created_at   DateTime @default(now())
+  is_disabled  Boolean  @default(false)
 }
