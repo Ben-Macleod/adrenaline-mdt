@@ -13,9 +13,19 @@ datasource db {
 // `id` is the relation id of the community for database purposes.
 // `community_id` is the id created by the community owner, e.x. 'VEXRP'.
 model system_communities {
-  id           Int      @id @default(autoincrement())
-  community_id String   @unique @db.VarChar(10)
-  name         String   @db.LongText
-  created_at   DateTime @default(now())
-  is_disabled  Boolean  @default(false)
+  id                      Int                       @id @default(autoincrement())
+  community_id            String                    @unique @db.VarChar(10)
+  name                    String                    @db.LongText
+  created_at              DateTime                  @default(now())
+  is_disabled             Boolean                   @default(false)
+  system_community_tokens system_community_tokens[]
+}
+
+model system_community_tokens {
+  id            Int    @id @default(autoincrement())
+  community_rid Int
+  token_type    String @db.LongText
+  token_value   String @db.LongText
+
+  system_communities system_communities @relation(fields: [community_rid], references: [id])
 }

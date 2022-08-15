@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
-import ErrorService from '../../../lib/services';
-import errorFactory from '../../../lib/services';
+import { CommunityService, ErrorService } from '../../../lib/services';
 
 const prisma = new PrismaClient();
 
@@ -33,7 +32,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 
 	// Reqiure that name & communityId be passed.
 	if (!communityId && !name) {
-		const { error } = new ErrorService(404, 1004);
+		const { error } = new ErrorService({ internalCode: '2001' });
 
 		return res
 			.status(404)
@@ -44,31 +43,17 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
 			);
 	}
 
-	// Create the new community through prisma.
-	const newCommunity = await prisma.system_communities.create({
-		data: {
-			name,
-			community_id: communityId,
-		},
-	});
+	try {
+		const { create } = new CommunityService({});
+		const newCommunity = await create(communityId, name);
 
-	// If there was an error creating the community catch the response here.
-	if (!newCommunity) {
-		const { error } = new ErrorService(500, 2001);
-
-		return res
-			.status(500)
-			.json(
-				error(
-					'An error occured while creating new community, please try again.'
-				)
-			);
+		res.status(200).json({
+			isSuccess: Boolean(newCommunity),
+			data: { ...newCommunity },
+		});
+	} catch (error) {
+		res.status(500).json({ ...error });
 	}
-
-	res.status(200).json({
-		isSuccess: Boolean(newCommunity),
-		community: { ...newCommunity },
-	});
 };
 
 export default handler;

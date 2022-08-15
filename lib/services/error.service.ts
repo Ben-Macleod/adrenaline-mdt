@@ -1,10 +1,16 @@
 class ErrorService {
-	httpCode: number;
-	internalCode: number;
+	httpCode: string;
+	internalCode: string;
 
-	constructor(httpCode: number, internalCode: number) {
-		this.httpCode = httpCode;
-		this.internalCode = internalCode;
+	constructor({
+		httpCode,
+		internalCode,
+	}: {
+		httpCode?: number;
+		internalCode?: number | string;
+	}) {
+		this.httpCode = String(httpCode) || '000';
+		this.internalCode = String(internalCode) || '0000';
 	}
 
 	/**
@@ -14,14 +20,12 @@ class ErrorService {
 	 * @returns Returns an object of the error.
 	 */
 	error = (message: string, eType?: string) => {
-		return {
-			error: {
-				httpsCode: this.httpCode,
-				code: this.internalCode,
-				message: message,
-				type: eType || null,
+		return new Error(message, {
+			cause: {
+				message,
+				name: eType || '',
 			},
-		};
+		});
 	};
 }
 
