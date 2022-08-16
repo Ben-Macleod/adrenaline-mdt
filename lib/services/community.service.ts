@@ -14,7 +14,12 @@ class Community {
     this.db = new PrismaClient();
   }
 
-  // Create the new community, does not relay on constructor data.
+  /**
+   * Create a new community and all it's information.
+   * @param communityId custom community id created by the user.
+   * @param name Name of the new community.
+   * @returns The new community along with their api access token.
+   */
   create = async (communityId: string, name: string) => {
     const communityData = {
       community_id: communityId,
@@ -28,7 +33,7 @@ class Community {
 
     // If the new commuity or relational id wasn't made throw error.
     if (!newCommunity || !newCommunity.id) {
-      const { error } = new ErrorService({ internalCode: "2001" });
+      const { error } = new ErrorService({ internalCode: "2002" });
       throw error(
         "An error occured while creating new community.",
         "ApiCommunity_PrismaError"
@@ -67,6 +72,29 @@ class Community {
       accessToken: communityApiToken.token_value,
       community: newCommunity,
     };
+  };
+
+  /**
+   * Find a community by it's unique 10 character string.
+   * @param id Community id of the community it's trying to find.
+   * @returns community if it's found if not false.
+   */
+  getCommunityById = async (id?: string) => {
+    // default id to communityId passed in through constructor.
+    let _communityId = this.communityId;
+
+    // If id does exist that will trump the default.
+    if (id) {
+      _communityId = id;
+    }
+
+    const community = await this.db.system_communities.findUnique({
+      where: {
+        community_id: _communityId,
+      },
+    });
+
+    return community || false;
   };
 }
 

@@ -8,11 +8,56 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 
   // Handle which method the incoming request should be directed too.
   switch (method) {
+    case "GET":
+      return GET(req, res);
     case "POST":
       return POST(req, res);
     default:
       console.error("Unknown method reach at [/api/community].");
       throw new Error("Unknow method reached at [/api/community].");
+  }
+};
+
+// GET handler.
+// Handles the logic for getting a community.
+
+const communityGetSchema = z.object({
+  communityId: z.string().transform((value) => value.toLocaleUpperCase()),
+});
+
+const GET = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { communityId } = communityGetSchema.parse(req.query);
+
+  // Return an error if their isn't a community id.
+  if (!communityId) {
+    const { error } = new ErrorService({ internalCode: "2001" });
+
+    return res
+      .status(404)
+      .json(error("Could not find a community id to search for."));
+  }
+
+  try {
+    const { getCommunityById } = new CommunityService({ communityId });
+    const community = await getCommunityById();
+
+    // Return an error if the community wasn't found.
+    if (!community) {
+      const { error } = new ErrorService({ internalCode: "2002" });
+
+      return res
+        .status(404)
+        .json(
+          error(
+            "An error occured while finding new community",
+            "ApiCommunity_PrismaError"
+          )
+        );
+    }
+
+    res.status(200).json({ data: { community } });
+  } catch (error) {
+    res.status(500).json({ error });
   }
 };
 
