@@ -1,3 +1,12 @@
+interface ErrorType {
+	message: string;
+	type: string;
+	codes: {
+		internal: string;
+		https: string;
+	};
+}
+
 class ErrorService {
 	httpCode: string;
 	internalCode: string;
@@ -19,13 +28,17 @@ class ErrorService {
 	 * @param eType The type of the error which is optional defaults to null.
 	 * @returns Returns an object of the error.
 	 */
-	error = (message: string, eType?: string) => {
-		return new Error(message, {
-			cause: {
-				message,
-				name: eType || '',
+	error = (message: string, eType?: string): { error: ErrorType } => {
+		const errorStruct: ErrorType = {
+			message: message,
+			type: eType || 'UnknowErrorType',
+			codes: {
+				https: this.httpCode,
+				internal: this.internalCode,
 			},
-		});
+		};
+
+		return { error: errorStruct };
 	};
 }
 

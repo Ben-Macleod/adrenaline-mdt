@@ -19,6 +19,7 @@ model system_communities {
   created_at              DateTime                  @default(now())
   is_disabled             Boolean                   @default(false)
   system_community_tokens system_community_tokens[]
+  system_accounts         system_accounts[]
 }
 
 model system_community_tokens {
@@ -28,4 +29,21 @@ model system_community_tokens {
   token_value   String @db.LongText
 
   system_communities system_communities @relation(fields: [community_rid], references: [id])
+}
+
+model system_accounts {
+  id            Int          @id @default(autoincrement())
+  username      String       @unique
+  password      String       @db.LongText
+  role          AccountRoles @default(ACCOUNT)
+  community_rid Int
+  email         String?      @db.LongText
+
+  system_communities system_communities @relation(fields: [community_rid], references: [id])
+}
+
+enum AccountRoles {
+  SUPER_ADMIN
+  ADMIN
+  ACCOUNT
 }
