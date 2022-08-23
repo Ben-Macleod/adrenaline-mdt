@@ -9,3 +9,5 @@ export const LANDING_DESCRIPTION = `${BRAND_NAME} Mobile data terminal is the be
 					immerse your officers into the experience of a police
 					officer. Packaged with a Fivem resource to integrate your
 					framework seemlessly with our data terminal.`;
+
+export * from './auth';

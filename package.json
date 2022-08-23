@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.10.0",
     "@prisma/client": "^4.2.1",
     "@types/jsonwebtoken": "^8.5.8",
+    "cookies-next": "^2.1.1",
     "formik": "^2.2.9",
     "framer-motion": "^7.1.0",
     "jsonwebtoken": "^8.5.1",
